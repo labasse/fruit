@@ -1,2 +1,2 @@
-# fruit
-Projet d'exemple pour le cours : L'essetiel de Selenium
+# Fruits
+Projet d'exemple pour le cours LinkedIn Learning : L'essentiel de Selenium
