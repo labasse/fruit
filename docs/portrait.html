@@ -132,9 +132,13 @@
         majfondcanevas()
         return false
       }
-      let match = document.cookie.match(new RegExp("taille=([^;]+)"))
-      
-      taille.value = match ? match[1] : "5";
+      for(let param of document.cookie.split(';')) {
+        const [n, v] = param.split("=").map(e => e.trim())
+
+        if(n=="taille") {
+          taille.value = valeur.innerText = parseInt(v)
+        }
+      }
 
       fond.onchange = e => {
         if(e.target.files.length) {
