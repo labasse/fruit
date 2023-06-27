@@ -118,12 +118,15 @@
                 const filtre = ref('')
                 const salade = computed(()=>{
                     let mot = filtre.value.trim().toLowerCase()
-
-                    return mot.length > 0 
+                    let res = mot.length > 0 
                         ? tout.filter(f => 
                             f.titre.toLowerCase().search(mot)>=0 || 
                             f.description.toLowerCase().search(mot)>=0)
-                        : tout 
+                        : tout
+                    if(res.length === 1) {
+                      setTimeout(() => filtre.value = res[0].titre, 5000)
+                    } 
+                    return res
                 })
                 return {
                     filtre,
