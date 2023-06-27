@@ -115,14 +115,14 @@
       var depl0 = null
 
       canevas.ondragover  = e => e.preventDefault()
-      canevas.onmousedown = e => depl0 = e
-      canevas.onmousemove = e => majposfond(e, e)
-      canevas.onmouseup   = 
-      canevas.onmouseleave= e => majposfond(e, null)
-      canevas.onwheel     = e => {
-        fondzoom = Math.max(.5, Math.min(2, fondzoom+e.deltaY/1000))
-        majfondcanevas()
-      }
+      //canevas.onmousedown = e => depl0 = e
+      //canevas.onmousemove = e => majposfond(e, e)
+      //canevas.onmouseup   = 
+      //canevas.onmouseleave= e => majposfond(e, null)
+      //canevas.onwheel     = e => {
+      //  fondzoom = Math.max(.5, Math.min(2, fondzoom+e.deltaY/1000))
+      //  majfondcanevas()
+      //}
       fond.onchange = e => {
         if(e.target.files.length) {
           var reader = new FileReader();
@@ -163,6 +163,7 @@
           }
         }
         palette.innerHTML = html
+        //document.querySelectorAll("#palette .fruit").forEach(f => f.ondragstart=mondrag)
       }
       function majposfond(e, nouv) {
         if(depl0) {
@@ -187,17 +188,17 @@
         return div      
       }
 
-      function select(div) {
-        if(selection && (!div || selection.id!=div.id)) {
+      function select(id) {
+        if(selection && (!id || selection.id!=id)) {
           selection.className="fruit"
           selection = null
         }
-        if(div) {
-          let fruit = fruits[div.id]
+        if(id) {
+          let fruit = fruits[id]
 
           if(fruit) {
-            div.className = "fruit cur"
-            selection = div
+            selection = document.getElementById(id)
+            selection.className = "fruit cur"
           }
         }
       }
@@ -214,15 +215,16 @@
       }
 
       function drag(e) {
+        //e.stopPropagation()
         select(e.target.id)
-        e.dataTransfer.setData("text", JSON.stringify(
+        e.dataTransfer.setData("text/plain", JSON.stringify(
           init_xy(e, e.target, { id: e.target.id}))
         )
       }
 
       function drop(e) {
         e.preventDefault();
-        let icone = JSON.parse(e.dataTransfer.getData("text"))
+        let icone = JSON.parse(e.dataTransfer.getData("text/plain"))
         let fruit = fruits[icone.id]
         let div
 
@@ -241,14 +243,14 @@
           div.ondragover = e => e.preventDefault()
           div.onclick = click
           fruits[div.id] = fruit
-          body.appendChild(div) // Chrome bug : body / canevas
+          canevas.appendChild(div) // Chrome bug : body / canevas
         }
-        init_xy(e, body, fruit) // Chrome bug : body / caneva
+        init_xy(e, canevas, fruit) // Chrome bug : body / caneva
         fruit.x -= icone.x;
         fruit.y -= icone.y;
         div.style.left = `${fruit.x}px`
         div.style.top  = `${fruit.y}px`
-        select(div)  
+        select(div.id)  
       }
       majpalette()
     </script>    
