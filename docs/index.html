@@ -23,13 +23,13 @@
     <header>
       <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top" id="navbar">
         <div class="container-fluid">
-          <a class="navbar-brand" href="/">Salade de fruits</a>
+          <a class="navbar-brand" href="index.html">Salade de fruits</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item"><a class="nav-link" aria-current="page" href="#chercher">Chercher</a></li>
+              <li class="nav-item"><a class="nav-link active" aria-current="page" href="#chercher">Chercher</a></li>
               <li class="nav-item"><a class="nav-link" aria-current="page" href="#liste">Découvrir</a></li>
               <li class="nav-item"><a class="nav-link" href="#cuisiner">Cuisiner</a></li>
               <li class="nav-item"><a class="nav-link" href="calendrier.html">Calendrier</a></li>
@@ -44,7 +44,7 @@
     <div class="row py-lg-5">
       <div class="col-lg-6 col-md-8 mx-auto">
         <h1 class="fw-bold">Des fruits hauts en saveur !</h1>
-          <input class="form-control me-2 form-control-lg" type="search" placeholder="Exotique, été..." aria-label="Chercher" v-model="filtre">
+          <input class="form-control me-2 form-control-lg" type="search" placeholder="Exotique, été..." aria-label="Chercher" v-model="filtre" autofocus>
       </div>
     </div>
   </section>
