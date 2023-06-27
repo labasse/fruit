@@ -6,7 +6,12 @@
     <meta name="description" content="">
     <title>Salade de fruits - Portrait</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <style>
+      li.fruit {
+        z-index: 10
+      }
       .fruit {
         background-image: url('img/palette.gif');
         cursor: grab;
@@ -17,6 +22,7 @@
       }
       .cur {
         border: 1px dashed #555;
+        box-sizing: border-box;
       }
       .fruit:active {
         cursor: grabbing;
@@ -68,7 +74,7 @@
           </select>
           <ul class="list-inline" id="palette"></ul>
         </div>
-        <div class="col-8 col-md-6 col-lg-4" id='canevas' ondrop="drop(event)">
+        <div class="col-8 col-md-6 col-lg-4" id='canevas'>
         </div>
         <div class="col-4 col-md-3 col-lg-4">
           <div class="mb-3">
@@ -98,7 +104,6 @@
       const spriteSheet = 2520, spriteSize = 360
       const palette = document.getElementById("palette")
       const canevas = document.getElementById("canevas")
-      const body    = document.querySelector ("body")
       const taille  = document.getElementById("taille")
       const valeur  = document.getElementById("valeur")
       const fond    = document.getElementById("fond")
@@ -114,15 +119,15 @@
       var fondzoom = 1, fondtaille = 0, fondx = 0, fondy = 0
       var depl0 = null
 
-      canevas.ondragover  = e => e.preventDefault()
-      //canevas.onmousedown = e => depl0 = e
-      //canevas.onmousemove = e => majposfond(e, e)
-      //canevas.onmouseup   = 
-      //canevas.onmouseleave= e => majposfond(e, null)
-      //canevas.onwheel     = e => {
-      //  fondzoom = Math.max(.5, Math.min(2, fondzoom+e.deltaY/1000))
-      //  majfondcanevas()
-      //}
+      canevas.onmousedown = e => depl0 = e
+      canevas.onmousemove = e => majposfond(e, e)
+      canevas.onmouseup   = 
+      canevas.onmouseleave= e => majposfond(e, null)
+      canevas.onwheel     = e => {
+        fondzoom = Math.max(.5, Math.min(2, fondzoom+e.deltaY/1000))
+        majfondcanevas()
+        return false
+      }
       fond.onchange = e => {
         if(e.target.files.length) {
           var reader = new FileReader();
@@ -148,7 +153,7 @@
       }
       function majpalette() {  
         let html = ''
-        let palette_element = (x, y) => `<li class='list-inline-item fruit' id='${x}-${y}' style='background-position: ${x*45}px ${y*45}px;' draggable='true' ondragstart='drag(event)'>`
+        let palette_element = (x, y) => `<li class='list-inline-item fruit' id='${x}-${y}' style='background-position: ${x*45}px ${y*45}px;'>`
         
         if(partie.value>=0) {
           for(let coord of parties[partie.value]) {
@@ -163,7 +168,14 @@
           }
         }
         palette.innerHTML = html
-        //document.querySelectorAll("#palette .fruit").forEach(f => f.ondragstart=mondrag)
+        $(".fruit").draggable({
+          helper: "clone",
+          stack: ".draggable",
+          revert: "invalid",
+          drag: e => {
+            e.stopPropagation()
+          }
+        });
       }
       function majposfond(e, nouv) {
         if(depl0) {
@@ -204,55 +216,45 @@
       }
 
       function click(e) {
-        select(selection && e.target.id == selection.id ? null : e.target)
+        select(selection && e.target.id == selection.id ? null : e.target.id)
       }
 
-      function init_xy(e, element, obj) {
-        const r = element.getBoundingClientRect()
-        obj.x = e.pageX - document.documentElement.scrollLeft - r.left
-        obj.y = e.pageY - document.documentElement.scrollTop - r.top
-        return obj
-      }
+      $(()=>{
+        $("#canevas").droppable({
+          drop: function (e, ui) {
+              let droppable = $(this);
+              let draggable = ui.draggable;
+              let draggableid = draggable.attr('id')
+              let fruit = fruits[draggableid]
+              let div
 
-      function drag(e) {
-        //e.stopPropagation()
-        select(e.target.id)
-        e.dataTransfer.setData("text/plain", JSON.stringify(
-          init_xy(e, e.target, { id: e.target.id}))
-        )
-      }
+              if(fruit) {
+                div = document.getElementById(draggableid)
+              }
+              else {
+                const cpos = $(canevas).offset()
 
-      function drop(e) {
-        e.preventDefault();
-        let icone = JSON.parse(e.dataTransfer.getData("text/plain"))
-        let fruit = fruits[icone.id]
-        let div
-
-        if(fruit) {
-          div = document.getElementById(icone.id)
-        }
-        else {
-          fruit = { icone: icone.id, sprite: icone.id.split('-') }
-          div = resize(document.createElement("div"), fruit, 2)
-          div.id = `f${id++}`
-          div.className = "fruit"
-          div.style.position = "absolute"
-          div.draggable = true
-          div.ondragstart = drag
-          div.ondrop = drop
-          div.ondragover = e => e.preventDefault()
-          div.onclick = click
-          fruits[div.id] = fruit
-          canevas.appendChild(div) // Chrome bug : body / canevas
-        }
-        init_xy(e, canevas, fruit) // Chrome bug : body / caneva
-        fruit.x -= icone.x;
-        fruit.y -= icone.y;
-        div.style.left = `${fruit.x}px`
-        div.style.top  = `${fruit.y}px`
-        select(div.id)  
-      }
-      majpalette()
+                fruit = { icone: draggableid, sprite: draggableid.split('-') }
+                div = resize(document.createElement("div"), fruit, 2)
+                div.id = `f${id++}`
+                div.className = "fruit"
+                div.style.position = "absolute"
+                fruits[div.id] = fruit
+                canevas.appendChild(div) 
+                $(div).draggable({
+                  containment: "parent",
+                  drag: e => depl0 = null
+                }).click(click)
+                fruit.x = ui.offset.left - cpos.left
+                fruit.y =  ui.offset.top - cpos.top
+                div.style.left = `${fruit.x}px`
+                div.style.top  = `${fruit.y}px`
+              }
+              select(div.id)
+          }
+        });
+        majpalette()
+      });
     </script>    
 </body>
 </html>
