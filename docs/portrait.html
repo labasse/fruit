@@ -78,6 +78,10 @@
         </div>
         <div class="col-4 col-md-3 col-lg-4">
           <div class="mb-3">
+            <label for="titre" class="form-label">Titre</label>
+            <input type="text" name="titre" id="titre" value="">
+          </div>
+          <div class="mb-3">
             <label for="taille" class="form-label">Taille : <span id="valeur">5</span></label>
             <input type="range" class="form-range" min="0" max="9" step="1" id="taille" value="5">
           </div>
@@ -219,6 +223,11 @@
         select(selection && e.target.id == selection.id ? null : e.target.id)
       }
 
+      function reset() {
+        fruits={}
+        canevas.innerHTML = ""
+      }
+
       $(()=>{
         $("#canevas").droppable({
           drop: function (e, ui) {
@@ -227,13 +236,12 @@
               let draggableid = draggable.attr('id')
               let fruit = fruits[draggableid]
               let div
+              const cpos = $(canevas).offset()
 
               if(fruit) {
                 div = document.getElementById(draggableid)
               }
               else {
-                const cpos = $(canevas).offset()
-
                 fruit = { icone: draggableid, sprite: draggableid.split('-') }
                 div = resize(document.createElement("div"), fruit, 2)
                 div.id = `f${id++}`
@@ -246,7 +254,7 @@
                   drag: e => depl0 = null
                 }).click(click)
                 fruit.x = ui.offset.left - cpos.left
-                fruit.y =  ui.offset.top - cpos.top
+                fruit.y = ui.offset.top - cpos.top                
                 div.style.left = `${fruit.x}px`
                 div.style.top  = `${fruit.y}px`
               }
