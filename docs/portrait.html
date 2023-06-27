@@ -72,7 +72,7 @@
         </div>
         <div class="col-4 col-md-3 col-lg-4">
           <div class="mb-3">
-            <label for="taille" class="form-label">Taille</label>
+            <label for="taille" class="form-label">Taille : <span id="valeur">5</span></label>
             <input type="range" class="form-range" min="0" max="9" step="1" id="taille" value="5">
           </div>
           <div class="mb-3">
@@ -100,6 +100,7 @@
       const canevas = document.getElementById("canevas")
       const body    = document.querySelector ("body")
       const taille  = document.getElementById("taille")
+      const valeur  = document.getElementById("valeur")
       const fond    = document.getElementById("fond")
       const partie  = document.getElementById("partie") 
       const parties = [
@@ -140,6 +141,7 @@
         }
       }
       taille.oninput = e => {
+        valeur.innerText = e.target.value
         if(selection) {
           resize(selection, fruits[selection.id], e.target.value)
         }
