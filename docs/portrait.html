@@ -132,6 +132,10 @@
         majfondcanevas()
         return false
       }
+      let match = document.cookie.match(new RegExp("taille=([^;]+)"))
+      
+      taille.value = match ? match[1] : "5";
+
       fond.onchange = e => {
         if(e.target.files.length) {
           var reader = new FileReader();
