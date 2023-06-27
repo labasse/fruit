@@ -11,12 +11,16 @@
         background-image: url('img/palette.gif');
         cursor: grab;
       }
-      .fruit:hover, .cur {
+      .fruit:hover {
         background-color: rgba(192, 192, 192, 0.5);
         border-radius: 10px;
       }
+      .cur {
+        border: 1px dashed #555;
+      }
       .fruit:active {
-        cursor: grabbing
+        cursor: grabbing;
+        background-color: transparent;
       }
       #palette li {
         width: 45px;
@@ -56,6 +60,12 @@
     <div class="container">
       <div class="row">
         <div class="col-12 col-md-3 col-lg-4">
+          <select id="partie" onchange="majpalette()">
+            <option value="-1" selected>Tout</option>
+            <option value="0">Œil</option>
+            <option value="1">Nez</option>
+            <option value="2">Bouche</option>
+          </select>
           <ul class="list-inline" id="palette"></ul>
         </div>
         <div class="col-8 col-md-6 col-lg-4" id='canevas' ondrop="drop(event)">
@@ -88,22 +98,20 @@
       const spriteSheet = 2520, spriteSize = 360
       const palette = document.getElementById("palette")
       const canevas = document.getElementById("canevas")
+      const body    = document.querySelector ("body")
       const taille  = document.getElementById("taille")
       const fond    = document.getElementById("fond")
-
+      const partie  = document.getElementById("partie") 
+      const parties = [
+        [[6,1], [4,3], [5,3]],
+        [[4,0], [5,0], [3,1], [5,2], [2,2], [3,3]],
+        [[6,0], [6,1], [6,2], [6,3]]
+      ]
       var fruits = {}
       var id = 1
       var selection = null
       var fondzoom = 1, fondtaille = 0, fondx = 0, fondy = 0
       var depl0 = null
-
-      let html = ''
-      for(let y=0; y<4; y++) {
-        for(let x=0; x<7; x++) {
-          html+=`<li class='list-inline-item fruit' id='${x}-${y}' style='background-position: ${x*45}px ${y*45}px;' draggable='true' ondragstart='drag(event)'>`
-        }
-      }
-      palette.innerHTML = html
 
       canevas.ondragover  = e => e.preventDefault()
       canevas.onmousedown = e => depl0 = e
@@ -135,6 +143,24 @@
         if(selection) {
           resize(selection, fruits[selection.id], e.target.value)
         }
+      }
+      function majpalette() {  
+        let html = ''
+        let palette_element = (x, y) => `<li class='list-inline-item fruit' id='${x}-${y}' style='background-position: ${x*45}px ${y*45}px;' draggable='true' ondragstart='drag(event)'>`
+        
+        if(partie.value>=0) {
+          for(let coord of parties[partie.value]) {
+            html+=palette_element(7-coord[0], 4-coord[1])
+          }
+        }
+        else {
+          for(let y=0; y<4; y++) {
+            for(let x=0; x<7; x++) {
+              html+=palette_element(x, y)
+            }
+          }
+        }
+        palette.innerHTML = html
       }
       function majposfond(e, nouv) {
         if(depl0) {
@@ -209,17 +235,20 @@
           div.style.position = "absolute"
           div.draggable = true
           div.ondragstart = drag
+          div.ondrop = drop
+          div.ondragover = e => e.preventDefault()
           div.onclick = click
           fruits[div.id] = fruit
-          canevas.appendChild(div)
+          body.appendChild(div) // Chrome bug : body / canevas
         }
-        init_xy(e, canevas, fruit)
+        init_xy(e, body, fruit) // Chrome bug : body / caneva
         fruit.x -= icone.x;
         fruit.y -= icone.y;
         div.style.left = `${fruit.x}px`
         div.style.top  = `${fruit.y}px`
         select(div)  
       }
+      majpalette()
     </script>    
 </body>
 </html>
